@@ -4,7 +4,7 @@
 > 基于 WorkBuddy 八步流程构建，覆盖**补考 / 缓考 / 重修 / 成绩复核 / 奖助学金 / 宿舍与教室报修**六大类事务。
 
 ## 在线体验
-- 问答页（GitHub Pages）：`https://Zzz04W.github.io/college-affairs-agent/`
+- 问答页（GitHub Pages，手机/电脑直接打开）：`https://zzz04w.github.io/college-affairs-agent/`（自动跳转至 `agent/index.html`）
 - 仓库：`https://github.com/Zzz04W/college-affairs-agent`
 
 ## 三项质量指标（20 题定题测试，第 1 轮）
@@ -32,7 +32,7 @@ agent/
 └── 归档/                   # 2023 版教室报修流程（已废止，已移出检索）
 .workbuddy/skills/college-affairs-qa/SKILL.md   # 阶段四：作答规范技能
 03_数据/测试题库与验收记录表.xlsx                # 20 题定题 + 验收清单（已填）
-.github/workflows/check-corpus.yml              # 阶段六：每月1日语料健康检查
+_build/check.py                                  # 阶段六：可排程的语料健康检查脚本（自动化待接入）
 ```
 
 ## 核心技术要点
@@ -41,6 +41,9 @@ agent/
 3. **正式文件优先于 FAQ**：Q1 答“5 个工作日”而非 FAQ 通俗口径“3 天”。
 4. **边界与兜底**：资料外问题（交换生学分、校园卡）固定拒答并给替代路径；医疗/投资/处分/代办越界一律不答、转介或转人工。
 5. **三段式作答**：每答均含【结论】【依据（文件名＋条款号＋原文）】【下一步】。
+
+## 关于“自动化”（阶段六）
+本交付为静态站点发布形式，未配置平台级定时任务。已提供 `_build/check.py` 作为月度语料健康检查脚本（重跑 20 题并校验三项指标），可在支持定时任务的平台（如 CI）接入，实现“每月核对语料”的自动化目标。因此在验收清单“维护·自动化”维度按课程要求**如实标注为待补**。
 
 ## 本地运行
 问答页为纯静态文件，直接双击 `agent/index.html` 即可使用；也可：
