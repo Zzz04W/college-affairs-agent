@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>学院事务咨询助手</title>
+<style>
+  :root{--bg:#f5f7fa;--card:#fff;--brand:#2563eb;--brand2:#1e40af;--ok:#0f9d58;--warn:#d97706;--text:#1f2937;--sub:#6b7280;--line:#e5e7eb;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.6}
+  header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:18px 16px 16px}
+  header h1{margin:0;font-size:20px;font-weight:700}
+  header p{margin:6px 0 0;font-size:13px;opacity:.92}
+  .wrap{max-width:680px;margin:0 auto;padding:14px 14px 40px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .chip{background:#eef2ff;color:var(--brand2);border:1px solid #dbe3ff;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+  .chip:active{transform:scale(.96)}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .row{display:flex;gap:8px}
+  textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:16px;resize:none;height:64px;font-family:inherit}
+  button{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:0 18px;font-size:16px;font-weight:600;cursor:pointer}
+  button:active{background:var(--brand2)}
+  .ans .seg{margin:10px 0}
+  .seg .lab{display:inline-block;font-weight:700;color:var(--brand2);font-size:13px;background:#eef2ff;border-radius:6px;padding:1px 8px;margin-bottom:4px}
+  .seg .val{margin:0;white-space:pre-wrap;word-break:break-word}
+  .ev{font-size:13px;color:var(--sub);border-left:3px solid #c7d2fe;padding-left:8px;margin-top:4px}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .tag.s{background:#fee2e2;color:#b91c1c}
+  .tag.f{background:#dcfce7;color:#15803d}
+  .tag.b{background:#fef3c7;color:#b45309}
+  .meta{font-size:12px;color:var(--sub);margin-top:6px}
+  .foot{text-align:center;font-size:12px;color:var(--sub);margin-top:18px}
+  .empty{color:var(--sub);font-size:14px;text-align:center;padding:18px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>学院事务咨询助手</h1>
+  <p>覆盖补考 / 缓考 / 重修 / 成绩复核 / 奖助学金 / 宿舍与教室报修六大类事务 · 仅依据学院现行制度文件作答</p>
+</header>
+<div class="wrap">
+  <div class="chips" id="chips"></div>
+  <div class="box">
+    <div class="row">
+      <textarea id="q" placeholder="试着问我：补考申请要在多久内提交？"></textarea>
+    </div>
+    <div class="row" style="margin-top:8px;justify-content:flex-end">
+      <button id="ask">提问</button>
+    </div>
+  </div>
+  <div id="out"><div class="empty">在上方输入问题，或点选上面的常见问题。</div></div>
+  <div class="foot">资料以文件生效日期为准；本页为课堂练习用虚构语料，电话与金额为教学设定。</div>
+</div>
+<script>
+const KB = [{"id": "J1", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第四条", "category": "教学与考试", "conclusion": "成绩公布后5个工作日内通过教务系统提交，逾期关闭不再受理。", "text": "学生应于成绩公布后 5 个工作日内通过教务系统提交补考申请。逾期系统自动关闭，不再受理。", "keywords": ["补考", "申请", "提交", "多久", "几天内", "工作日", "系统", "逾期", "截止", "没交"], "weight": 1.0}, {"id": "J2", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第五条", "category": "教学与考试", "conclusion": "补考一般安排在新学期开学后第3周至第4周，以当期通知为准。", "text": "补考一般安排在新学期开学后第 3 周至第 4 周进行，具体时间以教务处当期通知为准。", "keywords": ["补考", "第几周", "周考", "开学后", "安排", "几周", "考完", "最晚", "什么时候"], "weight": 1.0}, {"id": "J3", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第六条第（三）项", "category": "教学与考试", "conclusion": "补考后仍不合格不予再次补考，须重修。", "text": "补考后仍不合格的，不予再次补考，须重修。", "keywords": ["补考", "没过", "又没过", "还能再补", "再次补考", "再补一次", "重修"], "weight": 1.0}, {"id": "J4", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第八条", "category": "教学与考试", "conclusion": "疾病、家庭重大变故等不可抗力无法参考可申请缓考。", "text": "因疾病、家庭重大变故等不可抗力确实无法参加期末考核的，可以申请缓考。", "keywords": ["缓考", "条件", "什么情况", "可以缓考", "不可抗力", "变故"], "weight": 1.0}, {"id": "J5", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第九条", "category": "教学与考试", "conclusion": "考核前系统提交缓考申请，附二级甲等以上医院证明；突发情况3个工作日内补办。", "text": "应在课程考核开始前通过教务系统提交缓考申请，并上传二级甲等以上医院诊断证明或相关证明材料……突发情况无法事前申请的，应于考核结束后 3 个工作日内补办。", "keywords": ["缓考", "材料", "什么材料", "证明", "医院", "二级甲等", "考核前", "提交"], "weight": 1.0}, {"id": "J6", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十条", "category": "教学与考试", "conclusion": "缓考成绩按实际得分记载，成绩单不标注“缓考”字样。", "text": "缓考成绩按实际得分记载，成绩单不标注“缓考”字样。", "keywords": ["缓考", "成绩单", "标注", "字样", "保研", "写不写", "写"], "weight": 1.0}, {"id": "J7", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第七条", "category": "教学与考试", "conclusion": "补考成绩按实际得分记载，成绩单标注“补考”字样。", "text": "补考成绩按实际得分记载，成绩单标注“补考”字样。补考成绩合格即取得该课程学分。", "keywords": ["补考", "成绩单", "标注", "字样", "补考字样"], "weight": 1.0}, {"id": "J8", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十四条", "category": "教学与考试", "conclusion": "同一门课重修不超过2次；第2次仍不合格按结业，可换发毕业证书。", "text": "同一门课程在校期间重修不超过 2 次；第 2 次重修仍不合格的，按结业处理，可在最长学习年限内申请换发毕业证书。", "keywords": ["重修", "几次", "最多", "次数", "2次", "结业", "换发", "毕业", "重修吗", "还能重修", "拿什么证", "什么证"], "weight": 1.0}, {"id": "J9", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十五条", "category": "教学与考试", "conclusion": "重修不额外收取学费。", "text": "重修不额外收取学费。", "keywords": ["重修", "学费", "交钱", "要钱", "收费", "额外"], "weight": 1.0}, {"id": "J10", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十二条", "category": "教学与考试", "conclusion": "补考后仍不合格、不予补考情形、缓考后仍不合格，应予重修。", "text": "应予重修的情形包括：补考后仍不合格；属于第六条规定不予补考的情形；缓考后仍不合格。", "keywords": ["重修", "情形", "要重修", "须重修", "应该重修", "缓考但没去考", "没去考", "缺考"], "weight": 1.0}, {"id": "J11", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十六条", "category": "教学与考试", "conclusion": "复核仅核查漏评、错统、错登，不重新评阅答卷。", "text": "成绩复核仅核查漏评、错统、错登三类情形，不重新评阅答卷，不对评分标准与评分尺度作出评价。", "keywords": ["成绩复核", "复核", "重新", "看卷子", "评阅", "卷子", "范围", "漏评", "错统", "错登"], "weight": 1.0}, {"id": "J12", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十七条", "category": "教学与考试", "conclusion": "成绩公布后10个工作日内向开课学院提交书面复核申请。", "text": "对成绩有异议的，应于成绩公布后 10 个工作日内向开课学院提交书面复核申请，写明课程名称、学期与异议事项。", "keywords": ["复核", "申请", "10个工作日", "书面", "开课学院", "怎么复核", "向谁"], "weight": 1.0}, {"id": "J13", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第六条第（一）项", "category": "教学与考试", "conclusion": "实践类课程（含实习、实验、课程设计、毕业设计）不合格不予补考，须重修。", "text": "实践类课程（含实习、实验、课程设计、毕业设计）不合格的，不予补考，须重修。", "keywords": ["实践", "实习", "实验", "课程设计", "毕业设计", "挂了", "能补考", "不予补考", "实践类"], "weight": 1.0}, {"id": "J14", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十一条", "category": "教学与考试", "conclusion": "未办理缓考手续且未参加考核的，按旷考处理。", "text": "未办理缓考手续且未参加考核的，按旷考处理。", "keywords": ["旷考", "没去考", "缺考", "没考", "缓考"], "weight": 1.0}, {"id": "J15", "file": "教学管理制度", "file_full": "本科生课程考核与补缓考管理办法（2024 年修订）", "clause": "第十九条", "category": "教学与考试", "conclusion": "毕业年级补考应安排在毕业学期第6周前完成。", "text": "毕业年级学生的补考，应安排在毕业学期第 6 周前完成。", "keywords": ["毕业班", "毕业年级", "毕业", "最晚", "第6周", "补考"], "weight": 1.0}, {"id": "A1", "file": "奖助学金办法", "file_full": "本专科学生奖助学金评审与发放办法（2025 年修订）", "clause": "第五条", "category": "奖助学金", "conclusion": "国家奖学金8000元/学年；须二年级以上，学业与综合排名均前10%，无不及格。", "text": "国家奖学金：适用于二年级以上（含二年级）学生。上一学年学业成绩排名与综合考评排名均位于前 10%，且无不及格科目。奖励标准为 8000 元／生／学年，一次性发放。", "keywords": ["国家奖学金", "8000", "前10", "10%", "二年级", "条件", "多少钱"], "weight": 1.0}, {"id": "A2", "file": "奖助学金办法", "file_full": "本专科学生奖助学金评审与发放办法（2025 年修订）", "clause": "第七条", "category": "奖助学金", "conclusion": "助学金分三档：一等4400、二等3300、三等2200元/年，按学期平均发放。", "text": "国家助学金：分为三档：一等 4400 元、二等 3300 元、三等 2200 元，均为每生每学年标准，按学期平均发放（每学期发放一半）。", "keywords": ["助学金", "分几档", "几档", "一等", "4400", "3300", "2200", "什么时候发", "学期", "发放"], "weight": 1.0}, {"id": "A3", "file": "奖助学金办法", "file_full": "本专科学生奖助学金评审与发放办法（2025 年修订）", "clause": "第十条", "category": "奖助学金", "conclusion": "国奖与励志不可兼得；助学金可与校内奖学金属兼得；国奖与助学金可兼得。", "text": "同一学年内，国家奖学金与国家励志奖学金不可兼得；国家助学金可与校内奖学金兼得；国家奖学金与国家助学金可以兼得。", "keywords": ["兼得", "同时拿", "一起拿", "同时申请", "能一起", "可以一起", "兼得规则", "国家奖学金", "国家励志奖学金", "助学金", "校内奖学金", "同时"], "weight": 1.0}, {"id": "A4", "file": "奖助学金办法", "file_full": "本专科学生奖助学金评审与发放办法（2025 年修订）", "clause": "第十一条", "category": "奖助学金", "conclusion": "受纪律处分且仍在影响期内的，取消当学年评审资格。", "text": "受到纪律处分且仍在影响期内的，取消当学年评审资格。", "keywords": ["处分", "受影响", "还能申请", "取消", "资格", "影响期", "旷课", "10学时"], "weight": 1.0}, {"id": "A5", "file": "奖助学金办法", "file_full": "本专科学生奖助学金评审与发放办法（2025 年修订）", "clause": "第九条", "category": "奖助学金", "conclusion": "个人申请截止9月10日；学院、学校分别公示不少于5个工作日。", "text": "个人申请：每年 9 月 10 日前向所在学院提交申请表及佐证材料；学院评审结果公示不少于 5 个工作日；学校审定结果公示不少于 5 个工作日。", "keywords": ["评审", "程序", "什么时候", "9月10", "申请截止", "公示"], "weight": 1.0}, {"id": "D1", "file": "宿舍报修办法", "file_full": "学生宿舍报修与维修管理办法（2024 版）", "clause": "第三条", "category": "后勤报修", "conclusion": "统一通过“后勤服务”线上平台提交报修单；紧急情况拨0411-0000-0000。", "text": "报修渠道：统一通过“后勤服务”线上平台提交报修单，需填写楼栋、房间号、故障类型与联系方式。紧急情况可直接拨打后勤值班电话 0411-0000-0000。", "keywords": ["宿舍", "报修", "渠道", "怎么报修", "平台", "漏水", "紧急", "电话", "门锁"], "weight": 1.0}, {"id": "D2", "file": "宿舍报修办法", "file_full": "学生宿舍报修与维修管理办法（2024 版）", "clause": "第四条", "category": "后勤报修", "conclusion": "一般维修24小时内响应、72小时内完成；紧急维修2小时内到场。", "text": "一般维修：24 小时内响应，72 小时内完成；紧急维修：2 小时内到场处理。", "keywords": ["宿舍", "维修", "多久", "响应", "24小时", "72小时", "2小时", "完成", "时限", "紧急"], "weight": 1.0}, {"id": "D3", "file": "宿舍报修办法", "file_full": "学生宿舍报修与维修管理办法（2024 版）", "clause": "第五条第（二）项", "category": "后勤报修", "conclusion": "人为损坏由责任人承担材料费，人工费由学院承担，按公示价目表执行。", "text": "因人为原因造成的损坏，由责任人承担材料费，人工费由学院承担；材料费按后勤管理处公示价目表执行。", "keywords": ["人为", "弄坏", "损坏", "赔", "材料费", "人工费", "价目表", "赔偿", "门锁"], "weight": 1.0}, {"id": "C1", "file": "教室多媒体流程", "file_full": "教室多媒体设备报修流程（2024 版）", "clause": "第二条", "category": "后勤报修", "conclusion": "通过“后勤服务”平台选“教室多媒体”报修，或拨教务处教学保障电话。", "text": "任课教师或学生信息员通过“后勤服务”平台选择“教室多媒体”类别提交，或拨打教务处教学保障电话 0411-0000-0002。", "keywords": ["教室", "多媒体", "投影", "报修", "找谁", "渠道", "平台", "电话", "音响"], "weight": 1.0}, {"id": "C2", "file": "教室多媒体流程", "file_full": "教室多媒体设备报修流程（2024 版）", "clause": "第三条", "category": "后勤报修", "conclusion": "上课期间30分钟内响应；一般故障2小时内到场、当日完成修复。", "text": "上课期间的故障按紧急件处理，30 分钟内响应，一般故障 2 小时内到场，当日内完成修复。", "keywords": ["投影", "多媒体", "多久", "响应", "30分钟", "2小时", "当日", "完成", "时限", "打不开"], "weight": 1.0}];
+const SAFETY = [{"type": "医疗健康", "keywords": ["药", "诊断", "睡不着", "睡眠", "心理", "抑郁", "治疗", "看病"], "conclusion": "我不提供任何用药或诊断建议。", "text": "本智能体仅依据学院事务制度文件作答，不涉及医疗健康判断。", "nextstep": "如持续睡眠或情绪困扰，建议联系学校心理健康教育中心或前往正规医疗机构就诊。"}, {"type": "投资理财", "keywords": ["理财", "投资", "收益", "炒股", "基金", "投钱"], "conclusion": "我不提供任何投资或理财建议。", "text": "本智能体服务范围为学院事务咨询，不包含投资理财。", "nextstep": "学费请按学校规定用途使用；理财请咨询持牌金融机构或家长。"}, {"type": "处分个案", "keywords": ["撤销处分", "把处分撤", "想办法把", "疏通", "帮忙撤销", "把处分"], "conclusion": "我无法代办、不提供规避路径，须按程序处理。", "text": "处分认定与撤销属个案，依据学生管理规定由相关部门核实。", "nextstep": "请联系所在学院学生工作办公室，由老师核实后按程序答复。"}, {"type": "代办决策", "keywords": ["代写", "代办", "定稿", "替我写", "直接定稿", "写一份", "申请书"], "conclusion": "我不代为生成定稿文书或代办决策。", "text": "个案决策与代办超出本智能体服务范围。", "nextstep": "建议先咨询学院辅导员与教务处，明确后果后再自行办理。"}];
+const FALLBACK = {"conclusion": "资料中未收录该问题，我不能推测。", "text": "五份语料（教学管理制度2024、奖助学金2025、宿舍报修2024、教室多媒体2024、教务FAQ2025）中均无相关条款。", "nextstep": "建议联系所在学院教学办公室或教务处学籍科咨询（电话见各文件维护部门）。"};
+const NEXT = {"教学与考试": "通过教务系统办理；具体以教务处当期通知为准（教学保障电话 0411-0000-0002）。", "奖助学金": "向所在学院学生工作办公室提交申请；评审与发放详见学生工作处规定。", "后勤报修": "通过“后勤服务”线上平台提交报修单；紧急情况拨打后勤值班电话 0411-0000-0000。"};
+const QUICK = ["补考申请要在多久内提交？","缓考要交什么材料？","重修要交学费吗？最多能重修几次？","国家奖学金多少钱？","助学金分几档？一等多少钱？","宿舍漏水怎么报修？多久能来？","教室投影打不开找谁？","交换生的学分怎么认定？"];
+
+function scoreEntry(e,q){let s=0;for(const k of e.keywords){if(q.indexOf(k)>=0)s++;}return s*(e.weight||1);}
+function answer(q){
+  for(const s of SAFETY){if(s.keywords.some(k=>q.indexOf(k)>=0)){return {mode:'safety',type:s.type,conclusion:s.conclusion,text:s.text,nextstep:s.nextstep,entries:[]};}}
+  const scored=KB.map(e=>[scoreEntry(e,q),e]).filter(x=>x[0]>=2).sort((a,b)=>b[0]-a[0]);
+  if(!scored.length){return {mode:'fallback',...FALLBACK,entries:[]};}
+  const seen=new Set(),entries=[];
+  for(const [s,e] of scored){if(seen.has(e.id))continue;seen.add(e.id);entries.push(e);}
+  return {mode:'kb',entries};
+}
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function render(r){
+  const out=document.getElementById('out');
+  if(r.mode==='kb'){
+    let cats=new Set(r.entries.map(e=>e.category));
+    let nextHtml=[...cats].map(c=>`<p class="val">▸ ${esc(NEXT[c]||'')}</p>`).join('');
+    let ev=r.entries.map(e=>`<div class="ev">《${esc(e.file_full)}》${esc(e.clause)}：${esc(e.text)}</div>`).join('');
+    let conc=r.entries.map(e=>'· '+esc(e.conclusion)).join('<br>');
+    out.innerHTML=`<div class="box ans">
+      <div class="seg"><span class="lab">结论</span><p class="val">${conc}</p></div>
+      <div class="seg"><span class="lab">依据</span>${ev}</div>
+      <div class="seg"><span class="lab">下一步</span>${nextHtml}</div>
+    </div>`;
+  } else {
+    let tag = r.mode==='safety' ? '<span class="tag s">越界·转介</span>' : '<span class="tag b">资料未收录</span>';
+    out.innerHTML=`<div class="box ans">
+      <div class="seg"><span class="lab">结论</span><p class="val">${esc(r.conclusion)} ${tag}</p></div>
+      <div class="seg"><span class="lab">依据</span><p class="val">${esc(r.text)}</p></div>
+      <div class="seg"><span class="lab">下一步</span><p class="val">▸ ${esc(r.nextstep)}</p></div>
+    </div>`;
+  }
+}
+function ask(){const q=document.getElementById('q').value.trim();if(!q)return;render(answer(q));}
+document.getElementById('ask').addEventListener('click',ask);
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();}});
+const chips=document.getElementById('chips');
+QUICK.forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;c.onclick=()=>{document.getElementById('q').value=t;ask();};chips.appendChild(c);});
+</script>
+</body>
+</html>
